@@ -1,5 +1,27 @@
+# %load timewalk_fun.py
 from sklearn.cluster import DBSCAN
 #from joblib import Parallel, delayed
+
+from scipy.optimize import curve_fit
+from scipy.stats import norm
+
+def getData(fname):
+    with h5py.File(fname, 'r') as f:
+        rawNr  = f['raw/trigger nr'][:]
+        rawTof = f['raw/tof'][:]*1e6
+        rawTot = f['raw/tot'][:]
+        rawX   = f['raw/x'][:]
+        rawY   = f['raw/y'][:]
+        centNr = f['centroided/trigger nr'][:]
+        centTof= f['centroided/tof'][:]*1e6
+        centTot= f['centroided/tot max'][:]
+        centY  = f['centroided/y'][:]
+        centX  = f['centroided/x'][:]
+    return rawNr, rawTof, rawTot, rawX, rawY, centNr, centTof, centTot, centY, centX
+
+def gauss(x, *p):
+    A, mu, sigma = p
+    return A * np.exp(-(x - mu) ** 2 / (2. * sigma ** 2))
 
 def plot_TofTot(tof, tot, region, fname, **kwargs):
     # Filter for the calibration region we are looking at
@@ -120,8 +142,7 @@ def compute_tw_lookup(tof, tot, region, maxTot_slice=167, minTot=0, maxToT_1=400
                 val = np.polyval(p2, ((x + 1) * 25))
                 tot_lookup_table[x] = val
         except:
-            pass    
-
+            pass
     a = hv.Curve((tot_points+12.5, timewalk_points)).opts(color='blue')
     b = hv.Curve((x1, tw_lookup1)).opts(color='orange', line_width=1)
     c = hv.Curve((x2, tw_lookup2)).opts(color='green', line_width=1)
