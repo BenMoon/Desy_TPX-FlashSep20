@@ -65,7 +65,7 @@ def plot_TofTot_hv(tof, tot, region, fname, **kwargs):
 
     #plt.imshow(time_hist.T, origin='lower', cmap='jet')
     return hv.Image(time_hist.T[::-1], bounds=(tot_bins[0], time_bins[0], tot_bins[-1], time_bins[-1])).opts(
-        width=800, cmap='jet', title=fname, ylabel='diff TOF', xlabel='TOT', logz=True)
+        width=1000, cmap='jet', title=fname, ylabel='diff TOF', xlabel='TOT', logz=True)
 
 def compute_timewalk(tof, tot, region, maxTot_slice):
     tot_points = []
@@ -115,7 +115,7 @@ def compute_timewalk(tof, tot, region, maxTot_slice):
         tot_points.append(tot_bins[b])
 
     image = hv.Image(time_hist.T[::-1], bounds=(tot_bins[0], time_bins[0], tot_bins[-1], time_bins[-1])).opts(
-        width=1200, height=600, cmap='jet', ylabel='diff TOF', xlabel='TOT', logz=True, tools=['hover'])
+        width=1200, height=300, cmap='jet', ylabel='diff TOF', xlabel='TOT', logz=True, tools=['hover'])
     return np.array(tot_points), np.array(time_walk_points), image
 
 def compute_tw_lookup(tof, tot, region, maxTot_slice=167, minTot=0, maxToT_1=4000, polyorder=12):
@@ -181,3 +181,11 @@ def doCentroiding(shot, x, y, tof, tot, _epsilon=2, _samples=5):
     XCentNew2  = pd.DataFrame(np.column_stack((props[0], props[1], props[2], props[3], props[4])), 
                  columns=['nr', 'x', 'y', 'tof', 'tot'])
     return XCentNew2
+
+def save_tof_2hdf5(fname, tof_tw):
+    with h5py.File(fname, 'r+') as f:
+        if f.keys().__contains__('centroided/tof_tw'):
+            data = f['centroided/tof_tw']
+            data[...] = tof_tw
+        else:
+            f['centroided/tof_tw'] = tof_tw
