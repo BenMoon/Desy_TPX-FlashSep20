@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import h5py
 import pandas as pd
@@ -39,6 +40,6 @@ def getData(fname):
     except:
         print(f'key "{keys}" not known or file "{fname}" not existing')
 
-def gauss(x, *p):
+def gauss_fwhm(x, *p):
     A, mu, fwhm = p
     return A * np.exp(-(x - mu) ** 2 / (2. * (fwhm ** 2)/(4*2*np.log(2))))

@@ -5,19 +5,6 @@ from sklearn.cluster import DBSCAN
 from scipy.optimize import curve_fit
 from scipy.stats import norm
 
-def getData(fname):
-    with h5py.File(fname, 'r') as f:
-        rawNr  = f['raw/trigger nr'][:]
-        rawTof = f['raw/tof'][:]*1e6
-        rawTot = f['raw/tot'][:]
-        rawX   = f['raw/x'][:]
-        rawY   = f['raw/y'][:]
-        centNr = f['centroided/trigger nr'][:]
-        centTof= f['centroided/tof'][:]*1e6
-        centTot= f['centroided/tot max'][:]
-        centY  = f['centroided/y'][:]
-        centX  = f['centroided/x'][:]
-    return rawNr, rawTof, rawTot, rawX, rawY, centNr, centTof, centTot, centY, centX
 
 def gauss(x, *p):
     A, mu, sigma = p
