@@ -41,6 +41,30 @@ def getData(fname):
     except:
         print(f'key "{keys}" not known or file "{fname}" not existing')
 
+        
+def get_data_pd(fname):
+    try:
+        with h5py.File(fname, 'r') as f:
+            rawNr  = f['raw/trigger nr'][:]
+            rawTof = f['raw/tof'][:]*1e6
+            rawTot = f['raw/tot'][:]
+            rawX   = f['raw/x'][:]
+            rawY   = f['raw/y'][:]
+            centNr = f['centroided/trigger nr'][:]
+            centTof= f['centroided/tof'][:]*1e6
+            centTot= f['centroided/tot max'][:]
+            centY  = f['centroided/y'][:]
+            centX  = f['centroided/x'][:]
+            
+        raw_data = pd.DataFrame(np.column_stack((rawNr, rawTof, rawTot, rawX, rawY)),
+                       columns=('nr', 'tof', 'tot', 'x', 'y'))
+        cent_data = pd.DataFrame(np.column_stack((centNr, centTof, centTot, centX, centY)),
+                       columns=('nr', 'tof', 'tot', 'x', 'y'))
+        return raw_data, cent_data
+    except:
+        print(f'key "{keys}" not known or file "{fname}" not existing')
+
+        
 def gauss_fwhm(x, *p):
     A, mu, fwhm = p
     return A * np.exp(-(x - mu) ** 2 / (2. * (fwhm ** 2)/(4*2*np.log(2))))
