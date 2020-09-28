@@ -1,0 +1,198 @@
+#e-IKrum100_0000_20200903-1714
+#e-IKrum100_0001_20200903-1727
+#- name: ion-run_0001_20200903-1229
+#  IKrum: 20
+#  sample: background
+#- name: ion-run_0002_20200903-1333
+#  IKrum: 20
+#  sample: background
+#  rep: 200
+#  pulses: 6
+#- name: ion-run_0003_20200903-1345
+#  IKrum: 20
+#  sample: background
+#  rep: 200
+#  pulses: 6
+#- e_name: e-run_0000_20200903-1303
+#  i_name: ion-run_0000_20200903-1216
+#  IKrum: 20
+#  sample: background
+#- e_name: e-run_0001_20200903-1344
+#  IKrum: 20
+#  sample: background
+#- e_name: e-run_0002_20200903-1344
+#  IKrum: 20
+#  sample: background
+#  rep: 200
+#  pulses: 6
+#- name: e-run_0003_20200903-1344
+#  IKrum: 20
+#  sample: background
+#  rep: 200
+#  pulses: 6
+
+e-run_0004_20200903-1345:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 6
+ion-run_0003_20200903-1345:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 6
+e-run_0005_20200903-1414:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 6
+ion-run_0005_20200903-1414:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 6
+e-run_0006_20200903-1504:
+    IKrum: 20
+    sample: He
+    rep: 200
+    pulses: 6
+e-run_0007_20200903-1517:
+    IKrum: 20
+    sample: He
+    rep: 200
+    pulses: 6
+e-run_0008_20200903-1526:
+    IKrum: 20
+    sample: He
+    rep: 200
+    pulses: 6
+e-run_0009_20200903-1541:
+    IKrum: 20
+    sample: He
+    rep: 1000
+    pulses: 30
+e-run_0010_20200903-1600:
+    IKrum: 20
+    sample: He
+    rep: 1000
+    pulses: 30
+e-run_0011_20200903-1626:
+    IKrum: 20
+    sample: He
+    rep: 200
+    pulses: 30
+e-run_0012_20200903-1638:
+    IKrum: 20
+    sample: He
+    rep: 1000
+    pulses: 30
+e-run_0013_20200903-1728:
+    IKrum: 20
+    sample: CH3I
+    rep: 100
+    pulses: 4
+ion-run_0006_20200903-1727:
+    IKrum: 20
+    sample: CH3I
+    rep: 100
+    pulses: 4
+e-run_0014_20200903-1738:
+    IKrum: 20
+    sample: CH3I
+    rep: 100
+    pulses: 4
+ion-run_0007_20200903-1738:
+    IKrum: 20
+    sample: CH3I
+    rep: 100
+    pulses: 4
+e-run_0015_20200903-1821:
+    IKrum: 20
+    sample: CH3I
+    rep: 200
+    pulses: 7
+ion-run_0008_20200903-1821:
+    IKrum: 20
+    sample: CH3I
+    rep: 200
+    pulses: 7
+e-run_0016_20200903-1835:
+    IKrum: 20
+    sample: CH3I
+    rep: 200
+    pulses: 7
+ion-run_0009_20200903-1835:
+    IKrum: 20
+    sample: CH3I
+    rep: 200
+    pulses: 7
+e-run_0017_20200903-1857:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 7
+ion-run_0010_20200903-1857:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 7
+e-run_0018_20200903-1908:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 7
+ion-run_0011_20200903-1908:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 7
+e-run_0019_20200903-1917:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 7
+ion-run_0012_20200903-1917:
+    IKrum: 20
+    sample: background
+    rep: 200
+    pulses: 7
+e-run_0020_20200903-2009:
+    IKrum: 150
+    sample: N2
+    rep: 250
+    pulses: 8
+ion-run_0013_20200903-2014:
+    IKrum: 150
+    sample: N2
+    rep: 250
+    pulses: 8
+e-run_0021_20200903-2042:
+    IKrum: 80
+    sample: N2
+    rep: 250
+    pulses: 8
+ion-run_0014_20200903-2043:
+    IKrum: 80
+    sample: N2
+    rep: 250
+    pulses: 8
+e-run_0022_20200903-2202:
+    IKrum: 150
+    sample: N2
+    rep: 250
+    pulses: 8
+ion-run_0016_20200903-2202:
+    IKrum: 150
+    sample: N2
+    rep: 250
+    pulses: 8
+e-run_0023_20200904-0004:
+    IKrum: 150
+    sample: N2
+    rep: 250
+    pulses: 1
+ion-run_0017_20200904-0004:
+    IKrum: 150
+    sample: N2
+    rep: 250
+    pulses: 1
