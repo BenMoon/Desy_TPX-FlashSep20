@@ -10,7 +10,7 @@ from holoviews import opts
 hv.extension('bokeh')
 
 opts.defaults(opts.Scatter(width=1000, height=300),
-              opts.Histogram(width=1000, height=600),
+              opts.Histogram(width=1000, height=300),
               opts.Image(width=1000, height=300),
               opts.Curve(width=1000, height=300),
               opts.Points(width=1000, height=300))

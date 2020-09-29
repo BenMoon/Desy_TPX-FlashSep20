@@ -76,6 +76,7 @@ e-run_0010_20200903-1600:
     sample: He
     rep: 1000
     pulses: 30
+    comment: micro-bunch trigger
 e-run_0011_20200903-1626:
     IKrum: 20
     sample: He
