@@ -1,5 +1,5 @@
 '''Create a data-base with all trainIDs and their corresponding hdf5 file'''
-
+import os
 import h5py
 import sqlite3
 from sqlite3 import Error
@@ -28,7 +28,7 @@ def create_files(conn, file):
     """
     sql = ''' INSERT INTO files(name) VALUES(?) '''
     cur = conn.cursor()
-    cur.execute(sql, file)
+    cur.execute(sql, (file,))
     conn.commit()
     return cur.lastrowid
 
@@ -42,7 +42,8 @@ def create_trainids(conn, trainid, file):
     sql = f''' INSERT INTO trainIDs(id, file_id)
                VALUES(?, (SELECT id FROM files WHERE name=="{file}")) '''
     cur = conn.cursor()
-    cur.execute(sql, trainid)
+    trainid = [(int(i),) for i in trainid]
+    cur.executemany(sql, trainid)
     conn.commit()
     return cur.lastrowid
 
@@ -57,13 +58,13 @@ def main():
     with conn:
         # get all hdf5 files where data from the DAQ is stored
         files = glob.glob('daq/*.h5')
-        for i, file in enumerate(files[:2]):
+        for file in files[:]:
             print(file)
-            create_files(conn, file)
+            fname = os.path.basename(file)
+            create_files(conn, fname)
             with h5py.File(file, 'r') as f:
                 ids = f['/FL1/Experiment/BL1/ADQ412 GHz ADC/CH00/TD/index'][:]
-                for id in ids:
-                    create_trainids(conn, id, file)
+                create_trainids(conn, ids, fname)
 
 
 if __name__ == '__main__':
