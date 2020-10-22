@@ -16,4 +16,8 @@ CREATE INDEX trainIDs_idx ON trainIDs (id);
 
 INSERT INTO files (name) VALUES ('testfile.h5');
 INSERT INTO trainIDs (train_id, file_id) VALUES (123, (select file_id from files where name=='testfile.h5'));
+
+SELECT * FROM trainIDs WHERE trainIDs.id = 842098343;
+SELECT * FROM files WHERE id IN (SELECT file_id FROM trainIDs WHERE id = 842098343 OR id = 843723669);
+SELECT * FROM files WHERE id IN (SELECT file_id FROM trainIDs WHERE (id > 842098343 AND id < 842098353) OR id = 843723669);
  */
