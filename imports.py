@@ -42,7 +42,7 @@ def getData(fname):
         print(f'key "{keys}" not known or file "{fname}" not existing')
 
         
-def get_data_pd(fname):
+def get_data_pd(fname: str) -> pd.DataFrame:
     try:
         with h5py.File(fname, 'r') as f:
             rawNr  = f['raw/trigger nr'][:]
