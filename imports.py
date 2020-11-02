@@ -1,3 +1,4 @@
+# %load imports.py
 import os
 import numpy as np
 import h5py
@@ -5,15 +6,20 @@ import pandas as pd
 from tqdm import tqdm
 import glob
 
+import param
+import panel as pn
 import holoviews as hv
 from holoviews import opts
-hv.extension('bokeh')
+hv.extension('bokeh', 'matplotlib')
+from bokeh.io import export_png, export_svgs
+
 
 opts.defaults(opts.Scatter(width=1000, height=300),
               opts.Histogram(width=1000, height=300),
               opts.Image(width=1000, height=300),
               opts.Curve(width=1000, height=300),
               opts.Points(width=1000, height=300))
+
 
 %pylab inline
 #from matplotlib.colors import LogNorm
@@ -23,24 +29,6 @@ rcParams['figure.figsize'] = (13.0, 6.)
 
 from scipy.optimize import curve_fit
 from scipy.stats import norm
-
-def getData(fname):
-    try:
-        with h5py.File(fname, 'r') as f:
-            rawNr  = f['raw/trigger nr'][:]
-            rawTof = f['raw/tof'][:]*1e6
-            rawTot = f['raw/tot'][:]
-            rawX   = f['raw/x'][:]
-            rawY   = f['raw/y'][:]
-            centNr = f['centroided/trigger nr'][:]
-            centTof= f['centroided/tof'][:]*1e6
-            centTot= f['centroided/tot max'][:]
-            centY  = f['centroided/y'][:]
-            centX  = f['centroided/x'][:]
-        return rawNr, rawTof, rawTot, rawX, rawY, centNr, centTof, centTot, centY, centX
-    except:
-        print(f'key "{keys}" not known or file "{fname}" not existing')
-
         
 def get_data_pd(fname: str) -> pd.DataFrame:
     try:
