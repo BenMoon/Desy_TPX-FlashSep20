@@ -1,3 +1,6 @@
 data
 out
 .ipynb_checkpoints
+dask-worker-space
+log
+daq
