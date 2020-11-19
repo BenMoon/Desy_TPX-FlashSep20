@@ -1,19 +1,26 @@
+# %load imports.py
 import os
 import numpy as np
 import h5py
 import pandas as pd
 from tqdm import tqdm
 import glob
+import yaml
 
+import param
+import panel as pn
 import holoviews as hv
 from holoviews import opts
-hv.extension('bokeh')
+hv.extension('bokeh', 'matplotlib')
+from bokeh.io import export_png, export_svgs
+
 
 opts.defaults(opts.Scatter(width=1000, height=300),
               opts.Histogram(width=1000, height=300),
               opts.Image(width=1000, height=300),
               opts.Curve(width=1000, height=300),
               opts.Points(width=1000, height=300))
+
 
 %pylab inline
 #from matplotlib.colors import LogNorm
@@ -23,26 +30,8 @@ rcParams['figure.figsize'] = (13.0, 6.)
 
 from scipy.optimize import curve_fit
 from scipy.stats import norm
-
-def getData(fname):
-    try:
-        with h5py.File(fname, 'r') as f:
-            rawNr  = f['raw/trigger nr'][:]
-            rawTof = f['raw/tof'][:]*1e6
-            rawTot = f['raw/tot'][:]
-            rawX   = f['raw/x'][:]
-            rawY   = f['raw/y'][:]
-            centNr = f['centroided/trigger nr'][:]
-            centTof= f['centroided/tof'][:]*1e6
-            centTot= f['centroided/tot max'][:]
-            centY  = f['centroided/y'][:]
-            centX  = f['centroided/x'][:]
-        return rawNr, rawTof, rawTot, rawX, rawY, centNr, centTof, centTot, centY, centX
-    except:
-        print(f'key "{keys}" not known or file "{fname}" not existing')
-
         
-def get_data_pd(fname):
+def get_data_pd(fname: str) -> pd.DataFrame:
     try:
         with h5py.File(fname, 'r') as f:
             rawNr  = f['raw/trigger nr'][:]
@@ -68,3 +57,28 @@ def get_data_pd(fname):
 def gauss_fwhm(x, *p):
     A, mu, fwhm = p
     return A * np.exp(-(x - mu) ** 2 / (2. * (fwhm ** 2)/(4*2*np.log(2))))
+
+
+def shift_microbunch_pulses(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, offset: float=0) -> pd.DataFrame:
+    """Fold consecutive micro-bunch pulses back to first"""
+    peaks = []
+    
+    # first find peaks
+    for i in range(nr_peaks):
+        mask = np.logical_and(data['tof'] > (offset + i*dt), data['tof'] < (offset + i*dt+1))
+        x_hist, x_edges = np.histogram(data['tof'][mask], bins=1_000)
+        x = (x_edges[:-1] + x_edges[1:]) * 0.5
+        popt, pcov = curve_fit(gauss_fwhm, x, x_hist, p0=[x_hist.max(), x[x_hist.argmax()], 0.05])
+        peaks.append(popt[1])
+    print(peaks)
+        
+    # shift bunches
+    for i in range(1, nr_peaks):
+        mask = np.logical_and(data['tof'] >= offset + i * dt, data['tof'] < offset + (i+1) * dt)
+        data['tof'][mask] -= (peaks[i] - peaks[0])
+
+    return data
+
+
+with open('runs.yaml', 'r') as f:
+    runNrs = yaml.safe_load(f)
