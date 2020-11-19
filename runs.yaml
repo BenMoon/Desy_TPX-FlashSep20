@@ -97,6 +97,7 @@ ion-run_0006_20200903-1727:
     sample: CH3I
     rep: 100
     pulses: 4
+    e-run: 13
 e-run_0014_20200903-1738:
     IKrum: 20
     sample: CH3I
@@ -107,6 +108,7 @@ ion-run_0007_20200903-1738:
     sample: CH3I
     rep: 100
     pulses: 4
+    e-run: 14
 e-run_0015_20200903-1821:
     IKrum: 20
     sample: CH3I
@@ -117,6 +119,7 @@ ion-run_0008_20200903-1821:
     sample: CH3I
     rep: 200
     pulses: 7
+    e-run: 15
 e-run_0016_20200903-1835:
     IKrum: 20
     sample: CH3I
@@ -127,6 +130,7 @@ ion-run_0009_20200903-1835:
     sample: CH3I
     rep: 200
     pulses: 7
+    e-run: 16
 e-run_0017_20200903-1857:
     IKrum: 20
     sample: background
@@ -137,6 +141,7 @@ ion-run_0010_20200903-1857:
     sample: background
     rep: 200
     pulses: 7
+    e-run: 17
 e-run_0018_20200903-1908:
     IKrum: 20
     sample: background
@@ -147,6 +152,7 @@ ion-run_0011_20200903-1908:
     sample: background
     rep: 200
     pulses: 7
+    e-run: 18
 e-run_0019_20200903-1917:
     IKrum: 20
     sample: background
@@ -157,6 +163,7 @@ ion-run_0012_20200903-1917:
     sample: background
     rep: 200
     pulses: 7
+    e-run: 19
 e-run_0020_20200903-2009:
     IKrum: 150
     sample: N2
@@ -167,6 +174,7 @@ ion-run_0013_20200903-2014:
     sample: N2
     rep: 250
     pulses: 8
+    e-run: 20
 e-run_0021_20200903-2042:
     IKrum: 80
     sample: N2
@@ -177,6 +185,7 @@ ion-run_0014_20200903-2043:
     sample: N2
     rep: 250
     pulses: 8
+    e-run: 21
 e-run_0022_20200903-2202:
     IKrum: 150
     sample: N2
@@ -187,6 +196,7 @@ ion-run_0016_20200903-2202:
     sample: N2
     rep: 250
     pulses: 8
+    e-run: 22
 e-run_0023_20200904-0004:
     IKrum: 150
     sample: N2
@@ -197,3 +207,4 @@ ion-run_0017_20200904-0004:
     sample: N2
     rep: 250
     pulses: 1
+    e-run: 23
