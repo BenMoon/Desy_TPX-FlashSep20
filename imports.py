@@ -59,18 +59,21 @@ def gauss_fwhm(x, *p):
     return A * np.exp(-(x - mu) ** 2 / (2. * (fwhm ** 2)/(4*2*np.log(2))))
 
 
-def shift_microbunch_pulses(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, offset: float=0) -> pd.DataFrame:
-    """Fold consecutive micro-bunch pulses back to first"""
+
+def find_peaks_in_microbunch(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, offset: float=0) -> list:
+    """find first peak in micro-bunch"""
     peaks = []
-    
-    # first find peaks
     for i in range(nr_peaks):
         mask = np.logical_and(data['tof'] > (offset + i*dt), data['tof'] < (offset + i*dt+1))
         x_hist, x_edges = np.histogram(data['tof'][mask], bins=1_000)
         x = (x_edges[:-1] + x_edges[1:]) * 0.5
         popt, pcov = curve_fit(gauss_fwhm, x, x_hist, p0=[x_hist.max(), x[x_hist.argmax()], 0.05])
         peaks.append(popt[1])
-    print(peaks)
+    return peaks
+
+def shift_microbunch_pulses(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, offset: float=0) -> pd.DataFrame:
+    """Fold consecutive micro-bunch pulses back to first"""    
+    peaks = find_peaks_in_microbunch(data, nr_peaks, dt, offset)
         
     # shift bunches
     for i in range(1, nr_peaks):
@@ -78,7 +81,6 @@ def shift_microbunch_pulses(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, o
         data['tof'][mask] -= (peaks[i] - peaks[0])
 
     return data
-
 
 with open('runs.yaml', 'r') as f:
     runNrs = yaml.safe_load(f)
