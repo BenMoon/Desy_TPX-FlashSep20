@@ -82,5 +82,7 @@ def shift_microbunch_pulses(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, o
 
     return data
 
+file_title = lambda x: os.path.basename(x).rstrip(".hdf5")
+
 with open('runs.yaml', 'r') as f:
     runNrs = yaml.safe_load(f)
