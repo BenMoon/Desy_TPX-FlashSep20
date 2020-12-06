@@ -82,6 +82,16 @@ def shift_microbunch_pulses(data: pd.DataFrame, nr_peaks: int=4, dt: float=10, o
 
     return data
 
+def radial_profile(data: np.array, center: tuple) -> np.array:
+    y, x = np.indices((data.shape))
+    r = np.sqrt((x - center[0])**2 + (y - center[1])**2)
+    r = r.astype(np.int)
+
+    tbin = np.bincount(r.ravel(), data.ravel())
+    nr = np.bincount(r.ravel())
+    radialprofile = tbin / nr
+    return radialprofile 
+
 file_title = lambda x: os.path.basename(x).rstrip(".hdf5")
 
 with open('runs.yaml', 'r') as f:
