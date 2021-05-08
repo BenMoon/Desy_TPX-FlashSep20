@@ -4,3 +4,5 @@ out
 dask-worker-space
 log
 daq
+__pycache__
+*.out
