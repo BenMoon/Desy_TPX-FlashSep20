@@ -32,7 +32,7 @@ def evaluate_single_trigger_dbscan(trigger_nr: int) -> np.array:
         y = f["raw/y"][mask]
         tof = f["raw/tof"][mask] * 1e6
         tot = f["raw/tot"][mask]
-    mask = tof < 10
+    mask = tof < 40
     # raw_data = pd.DataFrame(data=np.column_stack((trigger[mask], x[mask], y[mask], tof[mask], tot[mask])), columns=['nr', 'x', 'y', 'tof', 'tot'])
     # print(f"cluster size: {datasets['clustersize'][trigger_nr]}”)
 
@@ -40,7 +40,11 @@ def evaluate_single_trigger_dbscan(trigger_nr: int) -> np.array:
 
     # start crunching numbers
     dbscan_clustering = DBSCANClustering(
-        eps=1.5, min_samples=4, threshold=25, tof_scaling_factor=20 / 1000
+        eps=1.5,
+        min_samples=4,
+        threshold=25,
+        tof_scaling_factor=20 / 1000  # Tobis parameters
+        # eps=2, min_samples=5, threshold=25, tof_scaling_factor=1e1  # 20 / 1000 # parameters from raw converter
     )
     log_clustering = LaplacianOfGaussianClustering(
         strategy_label_allocation=NeighborsInDistanceAllocationStrategy()
@@ -71,15 +75,16 @@ def evaluate_single_trigger_peer(trigger_nr: int) -> np.array:
         y = f["raw/y"][mask]
         tof = f["raw/tof"][mask] * 1e6
         tot = f["raw/tot"][mask]
-    mask = tof < 10
+    mask = tof < 40
     # raw_data = pd.DataFrame(data=np.column_stack((trigger[mask], x[mask], y[mask], tof[mask], tot[mask])), columns=['nr', 'x', 'y', 'tof', 'tot'])
     # print(f"cluster size: {datasets['clustersize'][trigger_nr]}”)
 
     X = np.column_stack((x, y, tof, tot))
+    X = X[X[:, 2].argsort()]
 
     # start crunching numbers
     # Aufruf für Peers Algorithmus:
-    peer_clustering = PeersClustering(max_dist_tof=110)
+    peer_clustering = PeersClustering(max_dist_tof=0.11, min_cluster_size=3)
     pipeline_peers = Pipeline(pipeline_steps=[peer_clustering, CenterOfMassCentroiding()])
     centroids_peer = pipeline_peers.run(X)
 
@@ -116,11 +121,12 @@ with Pool(cpu_count) as p:
 clusters_dbscan = np.concatenate([i for i in results if i is not None])
 
 # save data
-np.save("out/ion-run_0016_20200903-2202_dbscan.npy", clusters_dbscan)
+np.save("out/ion-run_0016_20200903-2202_LoG-rawConv.npy", clusters_dbscan)
 
 ######
 # Peer
 # logger.debug(f'starting {cpu_count} threads')
+"""
 with Pool(cpu_count) as p:
     results = p.map(evaluate_single_trigger_peer, datasets[:])
 # logger.debug('All Treads finished the calculation')
@@ -128,3 +134,4 @@ clusters_peer = np.concatenate(results)
 
 # save data
 np.save("out/ion-run_0016_20200903-2202_peer.npy", clusters_peer)
+"""
