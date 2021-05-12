@@ -112,7 +112,7 @@ def radial_profile(data: np.array, center: tuple) -> np.array:
     radialprofile = tbin / nr
     return radialprofile
 
-get_x_axis = lambda x_bins: 0.5 * (x_bins[1:] + x_bins[:-1])
+get_x_axis_from_bins = lambda x_bins: 0.5 * (x_bins[1:] + x_bins[:-1])
 file_title = lambda x: os.path.basename(x).rstrip(".hdf5")
 
 with open("runs.yaml") as f:
