@@ -79,6 +79,8 @@ def evaluate_single_trigger_peer(trigger_nr: int) -> np.array:
     # raw_data = pd.DataFrame(data=np.column_stack((trigger[mask], x[mask], y[mask], tof[mask], tot[mask])), columns=['nr', 'x', 'y', 'tof', 'tot'])
     # print(f"cluster size: {datasets['clustersize'][trigger_nr]}”)
 
+    tw = np.load('out/timewalk_raw_N2.npy')
+    tof -= tw[np.int_(tot // 25 -1)]*1e9
     X = np.column_stack((x, y, tof, tot))
     X = X[X[:, 2].argsort()]
 
@@ -115,6 +117,7 @@ except:
 ######
 # DBSCAN
 # logger.debug(f'starting {cpu_count} threads')
+"""
 with Pool(cpu_count) as p:
     results = p.map(evaluate_single_trigger_dbscan, datasets[:])
 # logger.debug('All Treads finished the calculation')
@@ -122,11 +125,11 @@ clusters_dbscan = np.concatenate([i for i in results if i is not None])
 
 # save data
 np.save("out/ion-run_0016_20200903-2202_LoG-rawConv.npy", clusters_dbscan)
+"""
 
 ######
 # Peer
 # logger.debug(f'starting {cpu_count} threads')
-"""
 with Pool(cpu_count) as p:
     results = p.map(evaluate_single_trigger_peer, datasets[:])
 # logger.debug('All Treads finished the calculation')
@@ -134,4 +137,4 @@ clusters_peer = np.concatenate(results)
 
 # save data
 np.save("out/ion-run_0016_20200903-2202_peer.npy", clusters_peer)
-"""
+
