@@ -6,3 +6,4 @@ log
 daq
 __pycache__
 *.out
+.vscode

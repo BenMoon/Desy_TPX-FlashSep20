@@ -1,3 +1,4 @@
+repos:
 - repo: https://github.com/nbQA-dev/nbQA
   rev: 0.8.1
   hooks:
