@@ -4,10 +4,14 @@
 # https://stackoverflow.com/questions/19564625/how-can-i-import-from-another-ipython-notebook
 # I decided to use a seperate python file to collect my functions
 
-import pandas as pd
-import numpy as np
-from scipy.ndimage import gaussian_filter
+import h5py
 import holoviews as hv
+import numpy as np
+import pandas as pd
+from scipy.ndimage import gaussian_filter
+from scipy.optimize import curve_fit
+from scipy.stats import norm, binned_statistic_2d
+import scipy.integrate as integrate
 
 
 def hist2D_vmi(
@@ -107,7 +111,7 @@ def get_data_pd(fname: str) -> pd.DataFrame:
         )
         return raw_data, cent_data
     except:
-        print(f'key "{keys}" not known or file "{fname}" not existing')
+        print(f'key not known or file "{fname}" not existing')
 
 
 def gauss_fwhm(x, *p):
