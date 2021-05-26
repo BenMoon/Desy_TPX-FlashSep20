@@ -1,6 +1,6 @@
 # this file contains a collections of functions which may be usefull across notebooks
 # after looking for ways how to import functions from other notebooks I came accross
-# https://github.com/grst/nbimporter and 
+# https://github.com/grst/nbimporter and
 # https://stackoverflow.com/questions/19564625/how-can-i-import-from-another-ipython-notebook
 # I decided to use a seperate python file to collect my functions
 
@@ -17,9 +17,9 @@ def hist2D_vmi(
     sigma: int = None,
     weights: str = None,
 ) -> hv.Image:
-    '''plot a 2D histogram with the axis define as parameters
+    """plot a 2D histogram with the axis define as parameters
     default settings for the graph are log-scale for z-axis
-    
+
     Parameters
     ----------
     df : pandas.DataFrame
@@ -42,16 +42,16 @@ def hist2D_vmi(
         number for optional Gaussian smoothing of histogram
     weights : string, optional
         name of the corresponding column in `df` which should be used as weights for the histogram
-    
+
     Return
     ------
     holoviews.Image
-    
+
     See also
     --------
     holoviews.Image
     numpy.histogram2d
-    '''
+    """
     weights_data = df[weights] if weights is not None else None
     xy_hist, x_bins, y_bins = np.histogram2d(
         df[p["x"]], df[p["y"]], bins=bins, weights=weights_data
@@ -75,7 +75,7 @@ def hist2D_vmi(
 
 
 def TOF_spectrum(data, title="DBSCAN", bins=15_000, alpha=1):
-    '''plot TOF spectrum'''
+    """plot TOF spectrum"""
     x_hist, x_bins = np.histogram(data["tof"], bins=bins)
     tof = hv.Histogram((x_hist, x_bins), label=title).opts(
         xlabel="TOF (µs)", title=title
@@ -158,4 +158,3 @@ def radial_profile(data: np.array, center: tuple) -> np.array:
     nr = np.bincount(r.ravel())
     radialprofile = tbin / nr
     return radialprofile
-
