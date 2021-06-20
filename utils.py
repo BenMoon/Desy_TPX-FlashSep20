@@ -87,7 +87,7 @@ def TOF_spectrum(data, title="DBSCAN", bins=15_000, alpha=1):
     return tof.opts(alpha=alpha)
 
 
-def get_data_pd(fname: str) -> pd.DataFrame:
+def get_data_pd(fname: str) -> (pd.DataFrame, pd.DataFrame):
     try:
         with h5py.File(fname, "r") as f:
             rawNr = f["raw/trigger nr"][:]
@@ -100,14 +100,15 @@ def get_data_pd(fname: str) -> pd.DataFrame:
             centTot = f["centroided/tot max"][:]
             centY = f["centroided/y"][:]
             centX = f["centroided/x"][:]
+            size = f['centroided/clustersize'][:]
 
         raw_data = pd.DataFrame(
             np.column_stack((rawNr, rawTof, rawTot, rawX, rawY)),
             columns=("nr", "tof", "tot", "x", "y"),
         )
         cent_data = pd.DataFrame(
-            np.column_stack((centNr, centTof, centTot, centX, centY)),
-            columns=("nr", "tof", "tot", "x", "y"),
+            np.column_stack((centNr, centTof, centTot, centX, centY, size)),
+            columns=("nr", "tof", "tot", "x", "y", 'size'),
         )
         return raw_data, cent_data
     except:
@@ -117,6 +118,18 @@ def get_data_pd(fname: str) -> pd.DataFrame:
 def gauss_fwhm(x, *p):
     A, mu, fwhm = p
     return A * np.exp(-((x - mu) ** 2) / (2.0 * (fwhm ** 2) / (4 * 2 * np.log(2))))
+
+def gauss_fwhm_double(x, *p):
+    '''function to fit 2 Gauss peaks'''
+    A, mu1, fwhm1, B, mu2, fwhm2 = p
+    return A * np.exp(-((x - mu1) ** 2) / (2.0 * (fwhm1 ** 2) / (4 * 2 * np.log(2)))) + B * np.exp(-((x - mu2) ** 2) / (2.0 * (fwhm2 ** 2) / (4 * 2 * np.log(2))))
+
+def gauss_fwhm_tripple(x, *p):
+    '''function to fit 3 Gauss peaks'''
+    A, mu1, fwhm1, B, mu2, fwhm2, C, mu3, fwhm3 = p
+    return (A * np.exp(-((x - mu1) ** 2) / (2.0 * (fwhm1 ** 2) / (4 * 2 * np.log(2)))) + 
+            B * np.exp(-((x - mu2) ** 2) / (2.0 * (fwhm2 ** 2) / (4 * 2 * np.log(2)))) +
+            C * np.exp(-((x - mu3) ** 2) / (2.0 * (fwhm3 ** 2) / (4 * 2 * np.log(2)))))
 
 
 def find_peaks_in_microbunch(
@@ -162,3 +175,40 @@ def radial_profile(data: np.array, center: tuple) -> np.array:
     nr = np.bincount(r.ravel())
     radialprofile = tbin / nr
     return radialprofile
+
+def print_tpx_hdf5(fname):
+    with h5py.File(fname, 'r') as f:
+        print(f'groups: {f.keys()}')
+        for key, val  in f.attrs.items():
+            print(f'-> {key}: {val}')  
+        print()
+        for grp in f.keys():
+            print(f'{grp} group: {f[grp].keys()}')
+            for key, val  in f[grp].attrs.items():
+                print(f'-> {key}: {val}')  
+            for ds in f[grp].keys():
+                for key, val  in f[grp][ds].attrs.items():
+                    print(f'   {ds} -> {key}: {val}')
+            for i in f[grp].items():
+                print(f'   {i}')
+        print('   |')
+        print('   |')
+        for grp in f['timing'].keys():
+            grpStr = f'timing/{grp}'
+            print(f'   -> {grpStr} group: {f[grpStr].keys()}')
+            for key, val  in f[grpStr].attrs.items():
+                print(f'      -> {key}: {val}')
+
+            for ds in f[f'{grpStr}'].keys():
+                for key, val  in f[grpStr][ds].attrs.items():
+                    print(f'          {ds} -> {key}: {val}')
+            for i in f[grpStr].items():
+                print(f'          {i}')
+                
+def nano_to_datetime(nano):
+    '''https://stackoverflow.com/questions/15649942/how-to-convert-epoch-time-with-nanoseconds-to-human-readable'''
+    import datetime
+    sec = nano*1e-9
+    dt = datetime.datetime.fromtimestamp(sec)
+    return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')
+    
