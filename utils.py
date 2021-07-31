@@ -12,6 +12,8 @@ from scipy.ndimage import gaussian_filter
 from scipy.optimize import curve_fit
 from scipy.stats import norm, binned_statistic_2d
 import scipy.integrate as integrate
+import param
+from tqdm import tqdm
 
 
 def hist2D_vmi(
@@ -137,11 +139,9 @@ def find_peaks_in_microbunch(
 ) -> list:
     """find first peak in micro-bunch"""
     peaks = []
-    for i in range(nr_peaks):
-        mask = np.logical_and(
-            data["tof"] > (offset + i * dt), data["tof"] < (offset + i * dt + 1)
-        )
-        x_hist, x_edges = np.histogram(data["tof"][mask], bins=1_000)
+    for i in tqdm(range(nr_peaks)):
+        df = data.query(f'{offset + i * dt} < tof < {offset + i * dt + 0.5}')
+        x_hist, x_edges = np.histogram(df["tof"], bins=1_000)
         x = (x_edges[:-1] + x_edges[1:]) * 0.5
         popt, pcov = curve_fit(
             gauss_fwhm, x, x_hist, p0=[x_hist.max(), x[x_hist.argmax()], 0.05]
@@ -151,7 +151,7 @@ def find_peaks_in_microbunch(
 
 
 def shift_microbunch_pulses(
-    data: pd.DataFrame, nr_peaks: int = 4, dt: float = 10, offset: float = 0
+    data: pd.DataFrame, nr_peaks: int = 4, dt: float = 10, offset: float = 0, width: float = 1
 ) -> pd.DataFrame:
     """Fold consecutive micro-bunch pulses back to first"""
     peaks = find_peaks_in_microbunch(data, nr_peaks, dt, offset)
@@ -159,7 +159,7 @@ def shift_microbunch_pulses(
     # shift bunches
     for i in range(1, nr_peaks):
         mask = np.logical_and(
-            data["tof"] >= offset + i * dt, data["tof"] < offset + (i + 1) * dt
+            data["tof"] >= offset + i * dt, data["tof"] < offset + (i + width) * dt
         )
         data["tof"][mask] -= peaks[i] - peaks[0]
 
@@ -212,3 +212,78 @@ def nano_to_datetime(nano):
     dt = datetime.datetime.fromtimestamp(sec)
     return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')
     
+    
+class Massspectrum(param.Parameterized):
+    df = param.DataFrame(pd.DataFrame())
+    x_hist = []
+    x_bins = []
+
+    def init_data(self, parameters: pd.DataFrame, data: pd.DataFrame) -> None:
+        self.data = data
+        print(f"{len(self.data):_} clusters")
+        self.df = parameters
+
+    @param.depends("df")
+    def view_tof(self):
+        mask = np.logical_and(self.data["tof"] > 0, self.data["tof"] < 20)
+        self.x_hist, self.x_bins = np.histogram(self.data["tof"][mask], bins=1000)
+        plot_tof = (
+            hv.Histogram((self.x_hist, self.x_bins))
+            .opts(xlabel="TOF (µs)", tools=["hover"])
+            .opts(height=400, width=1000)
+        )
+        for i, value in self.df["t"].notnull().iteritems():
+            if value:
+                plot_tof *= hv.VLine(self.df["t"][i]).opts(line_width=0.8, color="blue")
+
+        return plot_tof
+
+    def tof2moq(self, tof, t0, C):
+        """returns mass over charge as a function of time of flight"""
+        moq = ((tof - t0) / C) ** 2
+        return moq
+
+    @param.depends("df")
+    def massspect(self):
+        bounds = ([-np.inf, 0], [np.inf, np.inf])
+
+        try:
+            para, cov = curve_fit(
+                self.tof2moq,
+                self.df["t"][self.df["t"].notnull()],
+                self.df["m"][self.df["m"].notnull()]
+                / self.df["q"][self.df["q"].notnull()],
+                p0=[1, 1],
+                bounds=bounds,
+            )
+            t0i, Ci = para
+            print(f"fit parameters: {para}")
+            mq_fit = np.linspace(min(self.x_bins), max(self.x_bins), len(self.x_hist))
+
+            hv.Curve((mq_fit, self.x_hist)).opts(
+                xlabel="m/q",
+                logy=False,
+                xlim=(0, None),
+                width=1000,
+                axiswise=True,
+                tools=["hover"],
+            )
+            a = hv.Scatter(
+                (
+                    self.df["t"][self.df["t"].notnull()],
+                    self.df["m"][self.df["m"].notnull()]
+                    / self.df["q"][self.df["q"].notnull()],
+                )
+            ).opts(xlabel="TOF", ylabel="m/q", size=5)
+            b = hv.Curve((mq_fit, self.tof2moq(mq_fit, *para)))
+            # c = hv.Histogram((self.x_hist, self.x_bins)).opts(xlabel='TOF (µs)', tools=['hover']).opts(height=400, width=1000)
+            d = hv.Curve(
+                (self.tof2moq(mq_fit, *para), self.x_hist - self.x_hist.min() + 1)
+            ).opts(
+                xlabel="m/q", ylabel="counts (arb. u.)", axiswise=True, tools=["hover"]
+            )
+        except:
+            return
+
+        # hv.Curve((mq_fit, self.x_hist)).opts(xlabel='m/q', logy=False, xlim=(0, None), width=1000, axiswise=True, tools=['hover'])
+        return (a * b + d).cols(1)
