@@ -80,12 +80,24 @@ def hist2D_vmi(
     return hist2d  # _slice_1st + hist2d_slice_all
 
 
-def TOF_spectrum(data, title="DBSCAN", bins=15_000, alpha=1):
+def TOF_spectrum(data, title="DBSCAN", bins=15_000, alpha=1, gauss_fit=False):
     """plot TOF spectrum"""
     x_hist, x_bins = np.histogram(data["tof"], bins=bins)
     tof = hv.Histogram((x_hist, x_bins), label=title).opts(
         xlabel="TOF (µs)", title=title
     )
+    
+    if gauss_fit:
+        x = (x_bins[:-1] + x_bins[1:]) * 0.5
+        p0 = [x_hist.max(), x[x_hist.argmax()], 1]
+        popt, pcov = curve_fit(
+                gauss_fwhm, x, x_hist, p0=p0
+        )
+        print(popt)
+        gauss_fit = hv.Curve((x, gauss_fwhm(x, *popt)), label=f"FWHM {popt[2]*1e3:.1f} ns")
+        
+        return tof.opts(alpha=alpha) * gauss_fit
+    
     return tof.opts(alpha=alpha)
 
 
